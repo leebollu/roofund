@@ -1,3 +1,4 @@
+
 // API Configuration for different environments
 
 const getApiBaseUrl = (): string => {
@@ -6,22 +7,20 @@ const getApiBaseUrl = (): string => {
     return 'http://localhost:3001';
   }
   
-  // For Lovable.dev previews, use the deployed backend
+  // For Lovable.dev previews, use Supabase Edge Functions
   if (window.location.hostname.includes('lovable.app')) {
-    // You'll need to update this with your actual deployed backend URL
-    return 'https://your-backend-domain.com';
+    return 'https://zbnhyhxgatckymidothf.supabase.co/functions/v1';
   }
   
-  // Default production API URL
-  return process.env.REACT_APP_API_URL || 'https://your-backend-domain.com';
+  // Default production API URL (Supabase Edge Functions)
+  return 'https://zbnhyhxgatckymidothf.supabase.co/functions/v1';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
 
 export const API_ENDPOINTS = {
-  TEST_CONNECTION: `${API_BASE_URL}/api/email/test-connection`,
-  FETCH_LATEST: `${API_BASE_URL}/api/email/fetch-latest`,
-  HEALTH: `${API_BASE_URL}/health`
+  TEST_CONNECTION: `${API_BASE_URL}/test-email-connection`,
+  FETCH_LATEST: `${API_BASE_URL}/fetch-latest-email`,
 };
 
 console.log('🔗 API Base URL:', API_BASE_URL);
