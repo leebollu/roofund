@@ -61,7 +61,7 @@ const EmailConnectionForm: React.FC<EmailConnectionFormProps> = ({ onSuccess, on
         imapHost: credentials.imapHost,
         imapPort: credentials.imapPort,
         imapSecurity: credentials.imapSecurity,
-      });
+      }, password);
       onSuccess();
     }
   };

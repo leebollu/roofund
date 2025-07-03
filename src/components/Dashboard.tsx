@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Layout from './Layout';
+import EmailTestComponent from './EmailTestComponent';
 import { useEmailStore } from '@/store/useEmailStore';
 
 interface DashboardProps {
@@ -51,6 +52,18 @@ const Dashboard: React.FC<DashboardProps> = ({ onAddEmail }) => {
             ))}
           </div>
         </div>
+
+        {/* Email Testing - Show for connected accounts */}
+        {accounts.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Test Email Connection</h2>
+            {accounts.map((account) => (
+              <div key={account.id} className="mb-4">
+                <EmailTestComponent accountId={account.id} />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Scanning Status */}
         <Card className="bg-gradient-to-r from-blue-50 to-emerald-50 border-0 mb-8">
