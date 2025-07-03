@@ -100,46 +100,26 @@ export const useEmailStore = create<EmailState>((set, get) => ({
     setConnectionError(null);
     
     try {
-      // Simulate realistic connection test with validation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Basic validation - check if credentials look valid
-      if (!credentials.email || !credentials.password || !credentials.imapHost) {
-        throw new Error('Missing required credentials');
+      const response = await fetch('http://localhost:3001/api/email/test-connection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password,
+          imapHost: credentials.imapHost,
+          imapPort: credentials.imapPort,
+          imapSecurity: credentials.imapSecurity,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Connection failed');
       }
-      
-      if (!credentials.email.includes('@') || credentials.email.length < 5) {
-        throw new Error('Invalid email address format');
-      }
-      
-      if (credentials.password.length < 3) {
-        throw new Error('Password appears to be too short');
-      }
-      
-      // Test known email providers with realistic validation
-      const domain = credentials.email.split('@')[1]?.toLowerCase();
-      if (domain === 'gmail.com' && !credentials.password.includes('-')) {
-        throw new Error('Gmail requires an App Password (16 characters with dashes). Please generate one in your Google Account settings.');
-      }
-      
-      if (domain === 'yahoo.com' && credentials.password.length < 16) {
-        throw new Error('Yahoo Mail requires an App Password. Please generate one in your Yahoo Account settings.');
-      }
-      
-      // Check if host matches email provider
-      if (domain === 'gmail.com' && !credentials.imapHost.includes('gmail')) {
-        throw new Error('IMAP host should be imap.gmail.com for Gmail accounts');
-      }
-      
-      if (domain === 'outlook.com' && !credentials.imapHost.includes('outlook')) {
-        throw new Error('IMAP host should be outlook.office365.com for Outlook accounts');
-      }
-      
-      // Simulate potential connection failures
-      if (credentials.password === 'wrongpassword' || credentials.password === 'test123') {
-        throw new Error('Authentication failed. Please check your password.');
-      }
-      
+
       setConnecting(false);
       return true;
     } catch (error) {
@@ -162,37 +142,34 @@ export const useEmailStore = create<EmailState>((set, get) => ({
     set({ isFetchingEmail: true });
 
     try {
-      // Simulate email fetching with realistic delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Generate a realistic mock email based on the account
-      const mockEmails = [
-        {
-          uid: 12345,
-          subject: 'Welcome to Amazon Prime',
-          from: 'no-reply@amazon.com',
-          date: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-          snippet: 'Thank you for joining Amazon Prime. Your membership is now active.'
+      const response = await fetch('http://localhost:3001/api/email/fetch-latest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        {
-          uid: 12346,
-          subject: 'Your order has been shipped',
-          from: 'orders@shopify.com',
-          date: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-          snippet: 'Your order #12345 has been shipped and is on its way.'
-        },
-        {
-          uid: 12347,
-          subject: 'Payment confirmation',
-          from: 'noreply@stripe.com',
-          date: new Date(Date.now() - 1000 * 60 * 60 * 4), // 4 hours ago
-          snippet: 'Payment of $29.99 has been processed successfully.'
-        }
-      ];
-      
-      // Select a random email to simulate fetching the latest
-      const latestEmail = mockEmails[Math.floor(Math.random() * mockEmails.length)];
-      
+        body: JSON.stringify({
+          email: account.email,
+          password: account.credentials.password,
+          imapHost: account.imapHost,
+          imapPort: account.imapPort,
+          imapSecurity: account.imapSecurity,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to fetch email');
+      }
+
+      const latestEmail = data.email ? {
+        uid: data.email.uid,
+        subject: data.email.subject,
+        from: data.email.from,
+        date: new Date(data.email.date),
+        snippet: data.email.snippet
+      } : null;
+
       set({ latestEmail, isFetchingEmail: false });
       return latestEmail;
     } catch (error) {

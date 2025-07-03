@@ -1,73 +1,154 @@
-# Welcome to your Lovable project
+# Roofund - Email Transaction Tracker
 
-## Project info
+A modern web application that connects to your email accounts and helps track transaction emails, order confirmations, and refunds.
 
-**URL**: https://lovable.dev/projects/76b842c5-34fb-4c76-97fb-ad23c3c90c2d
+## 🚀 Features
 
-## How can I edit this code?
+- **Real IMAP Email Connections** - Connects to actual email servers (no simulation!)
+- **Universal Email Support** - Works with Gmail, Outlook, Yahoo, and any IMAP provider
+- **Transaction Email Scanning** - Fetches and analyzes purchase confirmations
+- **Modern UI** - Built with React, TypeScript, Tailwind CSS, and shadcn/ui
 
-There are several ways of editing your application.
+## 🏗️ Architecture
 
-**Use Lovable**
+- **Frontend**: Vite + React + TypeScript + shadcn/ui
+- **Backend**: Express.js + node-imap for real email connections
+- **No Database Required** - Credentials stored locally for testing
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/76b842c5-34fb-4c76-97fb-ad23c3c90c2d) and start prompting.
+## 🔧 Setup & Installation
 
-Changes made via Lovable will be committed automatically to this repo.
+### Quick Start
+```bash
+# Install frontend dependencies
+npm install
 
-**Use your preferred IDE**
+# Install backend dependencies  
+cd server && npm install && cd ..
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+# Start both servers
+./start-servers.sh
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Manual Setup
+```bash
+# Terminal 1: Start backend
+cd server
+npm run dev
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Terminal 2: Start frontend
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at:
+- **Frontend**: http://localhost:8080
+- **Backend API**: http://localhost:3001
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📧 Email Provider Setup
 
-**Use GitHub Codespaces**
+### Gmail
+1. Enable 2-factor authentication
+2. Go to Google Account → Security → 2-Step Verification → App passwords
+3. Generate App Password (16 characters with dashes)
+4. Use App Password instead of regular password
+5. IMAP Settings: `imap.gmail.com:993` (SSL)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Outlook/Hotmail  
+1. Enable 2-factor authentication (recommended)
+2. IMAP Settings: `outlook.office365.com:993` (SSL)
+3. Use regular password or App Password
 
-## What technologies are used for this project?
+### Yahoo Mail
+1. Enable 2-factor authentication
+2. Go to Account Security → Generate app password
+3. IMAP Settings: `imap.mail.yahoo.com:993` (SSL)
 
-This project is built with:
+## 🧪 Testing Real Connections
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Enter your email credentials in the app
+2. The backend will attempt a real IMAP connection
+3. Invalid credentials will show specific error messages
+4. Valid credentials will successfully connect and fetch emails
 
-## How can I deploy this project?
+**Test Cases:**
+- ❌ Wrong password → "Invalid credentials (Failure)"
+- ❌ Wrong IMAP host → "Connection failed"  
+- ❌ Gmail without App Password → Authentication error
+- ✅ Valid credentials → Connection successful
 
-Simply open [Lovable](https://lovable.dev/projects/76b842c5-34fb-4c76-97fb-ad23c3c90c2d) and click on Share -> Publish.
+## 🔒 Security
 
-## Can I connect a custom domain to my Lovable project?
+- No credentials stored on server
+- CORS protection
+- Helmet security headers
+- Connection timeouts
+- Error message sanitization
 
-Yes, you can!
+## 📁 Project Structure
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+```
+/
+├── src/                 # Frontend React app
+│   ├── components/      # UI components
+│   ├── store/          # Zustand state management
+│   └── pages/          # App pages
+├── server/             # Backend Express API
+│   ├── server.js       # Main server file
+│   └── package.json    # Backend dependencies
+└── start-servers.sh    # Startup script
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 🚀 Production Deployment
+
+### Backend (Vercel/Railway/Heroku)
+```bash
+cd server
+npm start
+```
+
+### Frontend (Netlify/Vercel)
+```bash
+npm run build
+# Deploy dist/ folder
+```
+
+Update `CORS_ORIGIN` environment variable to your frontend domain.
+
+## 🛠️ Development
+
+### Available Scripts
+
+**Frontend:**
+- `npm run dev` - Start Vite dev server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+
+**Backend:**
+- `npm run dev` - Start with nodemon (auto-reload)
+- `npm start` - Start production server
+
+### API Endpoints
+
+- `POST /api/email/test-connection` - Test IMAP credentials
+- `POST /api/email/fetch-latest` - Fetch latest email from inbox
+- `GET /health` - Health check
+
+## 🔍 Troubleshooting
+
+**"IMAP connection failed"**
+- Check email provider requires App Password
+- Verify IMAP host and port are correct
+- Ensure 2FA is enabled for provider
+
+**"Connection timeout"**
+- Check internet connection
+- Try different IMAP host (some providers have multiple)
+- Firewall may be blocking IMAP ports
+
+**Frontend can't reach backend**
+- Ensure backend is running on port 3001
+- Check CORS configuration
+- Verify frontend is calling correct API URL
+
+## 📄 License
+
+MIT License - feel free to use this project for learning and development.
