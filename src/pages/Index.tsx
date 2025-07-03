@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import WelcomeScreen from '@/components/WelcomeScreen';
 import EmailConnectionForm from '@/components/EmailConnectionForm';
 import ConnectionSuccessScreen from '@/components/ConnectionSuccessScreen';
@@ -12,9 +12,14 @@ const Index = () => {
   const { accounts } = useEmailStore();
   
   // Determine initial state based on whether user has connected accounts
-  const [currentState, setCurrentState] = useState<AppState>(
-    accounts.length > 0 ? 'dashboard' : 'welcome'
-  );
+  const [currentState, setCurrentState] = useState<AppState>('welcome');
+
+  // Navigate to dashboard if accounts exist
+  useEffect(() => {
+    if (accounts.length > 0 && currentState === 'welcome') {
+      setCurrentState('dashboard');
+    }
+  }, [accounts.length, currentState]);
 
   const handleGetStarted = () => {
     setCurrentState('connect-email');
