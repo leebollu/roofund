@@ -1,6 +1,5 @@
-
 import { create } from 'zustand';
-import { API_ENDPOINTS } from '@/config/api';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface EmailAccount {
   id: string;
@@ -101,25 +100,18 @@ export const useEmailStore = create<EmailState>((set, get) => ({
     setConnectionError(null);
     
     try {
-      const response = await fetch(API_ENDPOINTS.TEST_CONNECTION, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('test-email-connection', {
+        body: {
           email: credentials.email,
           password: credentials.password,
           imapHost: credentials.imapHost,
           imapPort: credentials.imapPort,
           imapSecurity: credentials.imapSecurity,
-        }),
+        },
       });
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Connection failed');
+      if (error || !data.success) {
+        throw new Error(data.error || error?.message || 'Connection failed');
       }
 
       setConnecting(false);
@@ -144,25 +136,18 @@ export const useEmailStore = create<EmailState>((set, get) => ({
     set({ isFetchingEmail: true });
 
     try {
-      const response = await fetch(API_ENDPOINTS.FETCH_LATEST, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('fetch-latest-email', {
+        body: {
           email: account.email,
           password: account.credentials.password,
           imapHost: account.imapHost,
           imapPort: account.imapPort,
           imapSecurity: account.imapSecurity,
-        }),
+        },
       });
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to fetch email');
+      if (error || !data.success) {
+        throw new Error(data.error || error?.message || 'Failed to fetch email');
       }
 
       const latestEmail = data.email ? {
