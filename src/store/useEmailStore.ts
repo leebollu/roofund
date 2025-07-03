@@ -1,5 +1,6 @@
 
 import { create } from 'zustand';
+import { API_ENDPOINTS } from '@/config/api';
 
 export interface EmailAccount {
   id: string;
@@ -100,7 +101,7 @@ export const useEmailStore = create<EmailState>((set, get) => ({
     setConnectionError(null);
     
     try {
-      const response = await fetch('http://localhost:3001/api/email/test-connection', {
+      const response = await fetch(API_ENDPOINTS.TEST_CONNECTION, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ export const useEmailStore = create<EmailState>((set, get) => ({
     set({ isFetchingEmail: true });
 
     try {
-      const response = await fetch('http://localhost:3001/api/email/fetch-latest', {
+      const response = await fetch(API_ENDPOINTS.FETCH_LATEST, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
